@@ -1,0 +1,70 @@
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "com.BW.deepalenergy"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.BW.deepalenergy"
+        minSdk = 30
+        targetSdk = 34
+        versionCode = 26
+        versionName = "1.0.2"
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            System.getenv("AUTOENERGY_DEBUG_KEYSTORE")
+                ?.takeIf(String::isNotBlank)
+                ?.let { signingKeyPath ->
+                    storeFile = file(signingKeyPath)
+                    storePassword = "android"
+                    keyAlias = "androiddebugkey"
+                    keyPassword = "android"
+                }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+        debug {
+            isMinifyEnabled = false
+            applicationIdSuffix = ".dhureadonly"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+}
+
+dependencies {
+    implementation("com.google.code.gson:gson:2.10.1")
+    testImplementation("junit:junit:4.13.2")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation("io.grpc:grpc-okhttp:1.65.1")
+    implementation("io.grpc:grpc-stub:1.65.1")
+}

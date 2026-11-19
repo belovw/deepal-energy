@@ -1,0 +1,15 @@
+.gradle/
+.idea/
+artifacts/
+**/build/
+local.properties
+*.jks
+*.keystore
+*.apk
+captures/
+.externalNativeBuild/
+.cxx/
+__pycache__/
+*.py[cod]
+*.log
+hs_err_pid*
