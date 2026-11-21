@@ -151,6 +151,9 @@ class DiagnosticsActivity : AppCompatActivity() {
                 refreshLog()
             }
         })
+        dataRow.addView(actionButton("Deepal 面板") {
+            startActivity(Intent(this, com.BW.deepalenergy.energy.DeepalPanelActivity::class.java))
+        })
         dataRow.addView(actionButton("选择已有数据文件") {
             runCatching { chooseData.launch("application/json") }.onFailure { Toast.makeText(this, "请通过文件管理器选择 JSON", Toast.LENGTH_LONG).show() }
         })

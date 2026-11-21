@@ -38,6 +38,11 @@
             android:exported="false"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name="com.BW.deepalenergy.energy.DeepalPanelActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|uiMode" />
         <service android:name="com.BW.deepalenergy.FuelCollectionService"
             android:exported="false" android:stopWithTask="false"
             android:foregroundServiceType="specialUse">
