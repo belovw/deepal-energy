@@ -69,12 +69,18 @@ data class DumpsysResult(val signals: Map<String, JSONObject>, val error: String
 
 /** Все последние значения сигналов из dumpsys, без выбора конкретных полей. */
 fun DumpsysEnergySource.readSignals(): DumpsysResult {
+    var stderrText = ""
+    var exitCode = -1
     val output = runCatching {
         val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", "dumpsys com.mega.car.CarService"))
         val text = process.inputStream.bufferedReader().use { it.readText() }
-        process.waitFor()
+        stderrText = process.errorStream.bufferedReader().use { it.readText() }
+        exitCode = process.waitFor()
         text
-    }.getOrElse { return DumpsysResult(emptyMap(), "dumpsys недоступен: ${it.javaClass.simpleName}") }
-    if (output.isBlank()) return DumpsysResult(emptyMap(), "dumpsys вернул пустой вывод")
+    }.getOrElse { return DumpsysResult(emptyMap(), "dumpsys недоступен: ${it.javaClass.simpleName} ${it.message}") }
+    if (output.isBlank()) {
+        val err = stderrText.trim().take(200)
+        return DumpsysResult(emptyMap(), "dumpsys пустой, код $exitCode, stderr: ${if (err.isEmpty()) "нет" else err}")
+    }
     return DumpsysResult(MegaCarDumpParser.parse(output))
 }
