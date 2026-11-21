@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /** Тестовый экран новых сигналов Deepal. Ничего не заменяет, только показывает значения. */
 class DeepalPanelActivity : AppCompatActivity() {
@@ -21,6 +22,36 @@ class DeepalPanelActivity : AppCompatActivity() {
     private val known = HashMap<String, JSONObject>()
     private var previousDriveTime: Double? = null
     private lateinit var text: TextView
+    @Volatile private var diagText: String = "Диагностика: запускается…"
+
+    /** Проверяет, какие сервисы видит приложение и открыт ли порт 40004 из старого журнала. */
+    private fun runDiagnostics(): String {
+        fun grep(cmd: String, label: String): String = try {
+            val p = ProcessBuilder("sh", "-c", cmd).redirectErrorStream(true).start()
+            val out = p.inputStream.bufferedReader().readText()
+            p.waitFor(5, TimeUnit.SECONDS)
+            val all = out.lines()
+            val hits = all.filter {
+                it.contains("car", true) || it.contains("mega", true) || it.contains("energy", true)
+            }
+            "$label: строк ${all.size}, подходящих ${hits.size}\n" + hits.take(8).joinToString("\n")
+        } catch (e: Exception) {
+            "$label: ошибка ${e.javaClass.simpleName}: ${e.message}"
+        }
+        val port = try {
+            java.net.Socket().use { s ->
+                s.connect(java.net.InetSocketAddress("127.0.0.1", 40004), 2000)
+                "порт 40004: ОТКРЫТ"
+            }
+        } catch (e: Exception) {
+            "порт 40004: закрыт (${e.javaClass.simpleName})"
+        }
+        return listOf(
+            grep("service list", "service list"),
+            grep("dumpsys -l", "dumpsys -l"),
+            port,
+        ).joinToString("\n")
+    }
 
     private val tick = object : Runnable {
         override fun run() {
@@ -41,11 +72,12 @@ class DeepalPanelActivity : AppCompatActivity() {
             setPadding(48, 48, 48, 48)
             gravity = Gravity.START
         }
-        setContentView(text)
+        setContentView(android.widget.ScrollView(this).apply { addView(text) })
     }
 
     override fun onResume() {
         super.onResume()
+        worker.execute { diagText = runDiagnostics() }
         handler.post(tick)
     }
 
@@ -97,6 +129,9 @@ class DeepalPanelActivity : AppCompatActivity() {
             line("Выработка генератора VCU_318", "VCU_318/DrvgCycTotGenrEgy"),
             line("Мощность батареи VCU_1A1", "VCU_1A1/VcuExtHvPwrCnsAct"),
             line("Напряжение 12 В", "EnergyInfo/LowVoltBatteryVoltage", " В"),
+            "",
+            "Диагностика:",
+            diagText,
         ).joinToString("\n")
     }
 
