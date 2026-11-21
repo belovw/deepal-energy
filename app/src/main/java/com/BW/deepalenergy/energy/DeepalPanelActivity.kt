@@ -56,7 +56,7 @@ class DeepalPanelActivity : AppCompatActivity() {
     private val tick = object : Runnable {
         override fun run() {
             worker.execute {
-                val result = source.readSignals()
+                val result = readSignalsFromFile()
                 runOnUiThread { show(result) }
             }
             handler.postDelayed(this, 1000)
@@ -73,6 +73,11 @@ class DeepalPanelActivity : AppCompatActivity() {
             gravity = Gravity.START
         }
         setContentView(android.widget.ScrollView(this).apply { addView(text) })
+        if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+        }
     }
 
     override fun onResume() {

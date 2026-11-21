@@ -84,3 +84,31 @@ fun DumpsysEnergySource.readSignals(): DumpsysResult {
     }
     return DumpsysResult(MegaCarDumpParser.parse(output))
 }
+
+/**
+ * Читает сигналы из файла, который дописывает цикл из ADB-оболочки:
+ * /sdcard/Download/energy_signals.txt. Берём только хвост файла (последние ~512 КБ),
+ * чтобы не читать большой файл целиком каждую секунду.
+ */
+fun readSignalsFromFile(path: String = "/sdcard/Download/energy_signals.txt"): DumpsysResult {
+    val file = java.io.File(path)
+    if (!file.exists()) return DumpsysResult(emptyMap(), "файл не найден: $path")
+    if (!file.canRead()) return DumpsysResult(emptyMap(), "нет доступа к файлу: $path")
+    val text = try {
+        java.io.RandomAccessFile(file, "r").use { raf ->
+            val start = maxOf(0L, raf.length() - 512 * 1024)
+            raf.seek(start)
+            val bytes = ByteArray((raf.length() - start).toInt())
+            raf.readFully(bytes)
+            String(bytes, Charsets.UTF_8)
+        }
+    } catch (e: Exception) {
+        return DumpsysResult(emptyMap(), "чтение файла: ${e.javaClass.simpleName} ${e.message}")
+    }
+    val signals = MegaCarDumpParser.parse(text)
+    return if (signals.isEmpty()) {
+        DumpsysResult(emptyMap(), "файл есть, но сигналов в нём пока нет")
+    } else {
+        DumpsysResult(signals)
+    }
+}
