@@ -56,7 +56,7 @@ class DeepalPanelActivity : AppCompatActivity() {
     private val tick = object : Runnable {
         override fun run() {
             worker.execute {
-                val result = readSignalsFromFile()
+                val result = readSignalsFromLogcat()
                 runOnUiThread { show(result) }
             }
             handler.postDelayed(this, 1000)
