@@ -13,7 +13,7 @@ private val MESSAGE_LINE = Regex(
 
 fun readSignalsFromLogcat(): DumpsysResult {
     val output = try {
-        val process = ProcessBuilder("logcat", "-d", "-s", "MessageProperty:I", "-t", "3000").redirectErrorStream(true).start()
+        val process = ProcessBuilder("sh", "-c", "logcat -d -s MessageProperty:I | grep -E 'EnergyInfo/|DrivingInfo/|VCU_318/|VCU_1A1/|GW_1E5/'").redirectErrorStream(true).start()
         val text = process.inputStream.bufferedReader().use { it.readText() }
         process.waitFor()
         text
