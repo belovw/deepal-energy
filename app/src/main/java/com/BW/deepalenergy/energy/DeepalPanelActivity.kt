@@ -22,7 +22,6 @@ class DeepalPanelActivity : AppCompatActivity() {
     private val known = HashMap<String, JSONObject>()
     private var previousDriveTime: Double? = null
     private lateinit var text: TextView
-    @Volatile private var diagText: String = "Диагностика: запускается…"
 
     /** Проверяет, какие сервисы видит приложение и открыт ли порт 40004 из старого журнала. */
     private fun runDiagnostics(): String {
@@ -82,7 +81,6 @@ class DeepalPanelActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        worker.execute { diagText = runDiagnostics() }
         handler.post(tick)
     }
 
@@ -129,14 +127,11 @@ class DeepalPanelActivity : AppCompatActivity() {
             line("Заряд батареи (SOC)", "EnergyInfo/SocPercent", " %"),
             line("Электро-запас хода", "EnergyInfo/SocResidualRange", " км"),
             line("Запас хода на бензине", "EnergyInfo/FuelResidualRange", " км"),
-            line("Датчик топлива EnergyInfo/FuelLevel (единицы уточняются)", "EnergyInfo/FuelLevel"),
+            line("Датчик топлива (единицы уточняются)", "EnergyInfo/FuelLevel"),
             driveLine,
             line("Выработка генератора VCU_318", "VCU_318/DrvgCycTotGenrEgy"),
             line("Мощность батареи VCU_1A1", "VCU_1A1/VcuExtHvPwrCnsAct"),
             line("Напряжение 12 В", "EnergyInfo/LowVoltBatteryVoltage", " В"),
-            "",
-            "Диагностика:",
-            diagText,
         ).joinToString("\n")
     }
 
