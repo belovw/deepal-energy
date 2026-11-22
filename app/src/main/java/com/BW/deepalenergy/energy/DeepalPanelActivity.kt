@@ -134,6 +134,9 @@ class DeepalPanelActivity : AppCompatActivity() {
             line("Напряжение 12 В", "EnergyInfo/LowVoltBatteryVoltage", " В"),
             engineLine(),
             tripTimeLine(),
+            "",
+            "Все сигналы, которые приходили (последнее значение):",
+            allSignalsText(),
         ).joinToString("\n")
     }
 
@@ -154,6 +157,15 @@ class DeepalPanelActivity : AppCompatActivity() {
     private fun tripTimeLine(): String {
         val v = (known["DrivingInfo/FuelTripDriveTime"]?.opt("value") as? Number)?.toDouble()
         return if (v == null) "Время работы ДВС (поездка): нет данных" else "Время работы ДВС (поездка): ${pretty(v)}"
+    }
+
+    /** Все числовые сигналы, которые приходили с запуска экрана, с последним значением. */
+    private fun allSignalsText(): String {
+        if (known.isEmpty()) return "пока ничего не пришло"
+        return known.keys.sorted().joinToString("\n") { name ->
+            val v = known[name]?.opt("value")
+            "$name = ${if (v is Number) pretty(v) else v.toString()}"
+        }
     }
 
     private fun pretty(v: Any): String = when (v) {
