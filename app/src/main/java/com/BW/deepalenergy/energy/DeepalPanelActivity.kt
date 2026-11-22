@@ -132,7 +132,28 @@ class DeepalPanelActivity : AppCompatActivity() {
             line("Выработка генератора VCU_318", "VCU_318/DrvgCycTotGenrEgy"),
             line("Мощность батареи VCU_1A1", "VCU_1A1/VcuExtHvPwrCnsAct"),
             line("Напряжение 12 В", "EnergyInfo/LowVoltBatteryVoltage", " В"),
+            engineLine(),
+            tripTimeLine(),
         ).joinToString("\n")
+    }
+
+    /** Статус ДВС из GW_1E5/EmsEngSts: 0 — стоит, 1 — запуск, 2 — работает (по наблюдению, уточняется). */
+    private fun engineLine(): String {
+        val v = (known["GW_1E5/EmsEngSts"]?.opt("value") as? Number)?.toInt()
+        val label = when (v) {
+            null -> "нет данных"
+            0 -> "стоит (0)"
+            1 -> "запуск (1)"
+            2 -> "работает (2)"
+            else -> v.toString()
+        }
+        return "Статус ДВС: $label"
+    }
+
+    /** Время работы ДВС за поездку, из DrivingInfo/FuelTripDriveTime (единицы уточняются). */
+    private fun tripTimeLine(): String {
+        val v = (known["DrivingInfo/FuelTripDriveTime"]?.opt("value") as? Number)?.toDouble()
+        return if (v == null) "Время работы ДВС (поездка): нет данных" else "Время работы ДВС (поездка): ${pretty(v)}"
     }
 
     private fun pretty(v: Any): String = when (v) {
