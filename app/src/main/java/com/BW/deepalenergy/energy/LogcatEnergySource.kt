@@ -11,9 +11,11 @@ private val MESSAGE_LINE = Regex(
     """MessageProperty:\s+receive\s+([A-Za-z0-9_/]+),\s+value\s*:\s*CarPropertyValue\{id=0x[0-9a-fA-F]+,\s*area=[^,]*,\s*status=\d+,\s*value=([^,}]+)"""
 )
 
+private val WANTED = listOf("EnergyInfo/", "DrivingInfo/", "VCU_318/", "VCU_1A1/", "GW_1E5/")
+
 fun readSignalsFromLogcat(): DumpsysResult {
     val output = try {
-        val process = ProcessBuilder("sh", "-c", "logcat -d -s MessageProperty:I | grep -E 'EnergyInfo/|DrivingInfo/|VCU_318/|VCU_1A1/|GW_1E5/'").redirectErrorStream(true).start()
+        val process = ProcessBuilder("logcat", "-d", "-s", "MessageProperty:I").redirectErrorStream(true).start()
         val text = process.inputStream.bufferedReader().use { it.readText() }
         process.waitFor()
         text
@@ -24,6 +26,7 @@ fun readSignalsFromLogcat(): DumpsysResult {
     output.lineSequence().forEach { line ->
         val m = MESSAGE_LINE.find(line) ?: return@forEach
         val (name, raw) = m.destructured
+        if (!WANTED.any { name.startsWith(it) }) return@forEach
         val number = raw.trim().toDoubleOrNull() ?: return@forEach
         signals[name] = JSONObject().put("value", number)
     }
