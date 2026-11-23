@@ -4,7 +4,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.content.Intent
 import android.view.Gravity
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
@@ -71,7 +74,26 @@ class DeepalPanelActivity : AppCompatActivity() {
             setPadding(48, 48, 48, 48)
             gravity = Gravity.START
         }
-        setContentView(android.widget.ScrollView(this).apply { addView(text) })
+        val scroll = android.widget.ScrollView(this).apply { addView(text) }
+        val home = Button(this).apply {
+            text = "На главный экран"
+            textSize = 18f
+            setOnClickListener {
+                startActivity(
+                    Intent(this@DeepalPanelActivity, com.BW.deepalenergy.MainActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                )
+                finish()
+            }
+        }
+        setContentView(
+            LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setBackgroundColor(Color.parseColor("#09111A"))
+                addView(home, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { setMargins(24, 24, 24, 0) })
+                addView(scroll, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
+            }
+        )
         if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) !=
             android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
