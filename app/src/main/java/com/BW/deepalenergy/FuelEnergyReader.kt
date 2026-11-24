@@ -21,6 +21,7 @@ data class FuelEnergySnapshot(
     val trip2DurationMinutes: Int?,
     val singleTripResetOption: Int?,
     val diagnostics: List<String>,
+    val tractionKw: Float? = null,
 ) {
     val summary: String
         get() = buildString {

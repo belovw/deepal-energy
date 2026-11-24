@@ -10,6 +10,7 @@
     <string name="ui_avg_speed">平均车速</string>
     <string name="ui_back">返回</string>
     <string name="ui_cancel">取消</string>
+    <string name="ui_traction_kw">牵引功率</string>
     <string name="ui_cannot_open_export">无法打开导出位置</string>
     <string name="ui_cannot_open_picker">无法打开文件选择器</string>
     <string name="ui_cd_energy">能量中心，点击左侧下方里程统计入口；长按卡片查看诊断</string>

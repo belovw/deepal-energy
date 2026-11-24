@@ -1,5 +1,6 @@
 package com.BW.deepalenergy
 
+import com.BW.deepalenergy.energy.tractionKwFromPercent
 import org.json.JSONObject
 
 /**
@@ -14,12 +15,14 @@ fun FuelEnergySnapshot.withLogcatSignals(signals: Map<String, JSONObject>): Fuel
     val avgFuel = num("DrivingInfo/FuelDriveCycleAverageConsumption")?.toFloat() ?: avgFuelTrip2
     val odometer = num("DrivingInfo/TotalDriveDistance")?.toFloat() ?: odometerKm
     val tripDistance = num("DrivingInfo/FuelTripDriveRange")?.toFloat() ?: trip2DistanceKm
+    val traction = num("DrivingInfo/EnginePower")?.let { tractionKwFromPercent(it).toFloat() } ?: tractionKw
     return copy(
         avgFuelTrip2 = avgFuel,
         fuelPercent = fuelPercent,
         oilRangeKm = fuelRange,
         odometerKm = odometer,
         trip2DistanceKm = tripDistance,
+        tractionKw = traction,
         diagnostics = diagnostics + "logcat signals=${signals.size}",
     )
 }

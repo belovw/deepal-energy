@@ -10,6 +10,7 @@
     <string name="ui_avg_speed">Средняя скорость</string>
     <string name="ui_back">Назад</string>
     <string name="ui_cancel">Отмена</string>
+    <string name="ui_traction_kw">Тяга, кВт</string>
     <string name="ui_cannot_open_export">Не удалось открыть место экспорта</string>
     <string name="ui_cannot_open_picker">Не удалось открыть выбор файла</string>
     <string name="ui_cd_energy">Центр энергии: нажмите «Статистика пробега» слева внизу, долгое нажатие на карточку открывает диагностику</string>
