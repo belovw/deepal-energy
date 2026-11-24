@@ -560,7 +560,7 @@ class OriginalEnergyView @JvmOverloads constructor(
 
         statMetric(canvas, durationText(data?.trip2DurationMinutes), context.getString(R.string.ui_drive_time), 220f, 350f)
         statMetric(canvas, distanceText(data?.trip2DistanceKm) + " km", context.getString(R.string.ui_drive_distance), 505f, 350f)
-        statMetric(canvas, speedText(data?.trip2AvgSpeed) + " km/h", context.getString(R.string.ui_avg_speed), 220f, 472f)
+        statMetric(canvas, speedText(data?.trip2AvgSpeed) + " " + context.getString(R.string.ui_unit_kmh), context.getString(R.string.ui_avg_speed), 220f, 472f)
         statMetric(canvas, fuelText(data?.avgFuelTrip2) + " L/100km", context.getString(R.string.ui_trip_fuel), 505f, 472f)
 
         line(canvas, 364f, 308f, 364f, 525f, Color.argb(85, 207, 225, 235))
@@ -574,7 +574,7 @@ class OriginalEnergyView @JvmOverloads constructor(
 
         statMetric(canvas, durationText(data?.trip1DurationMinutes), context.getString(R.string.ui_drive_time), 220f, 755f)
         statMetric(canvas, distanceText(data?.trip1DistanceKm) + " km", context.getString(R.string.ui_drive_distance), 505f, 755f)
-        statMetric(canvas, speedText(data?.trip1AvgSpeed) + " km/h", context.getString(R.string.ui_avg_speed), 220f, 890f)
+        statMetric(canvas, speedText(data?.trip1AvgSpeed) + " " + context.getString(R.string.ui_unit_kmh), context.getString(R.string.ui_avg_speed), 220f, 890f)
         statMetric(canvas, fuelText(data?.avgFuelTrip1) + " L/100km", context.getString(R.string.ui_avg_fuel), 505f, 890f)
 
         line(canvas, 364f, 700f, 364f, 940f, Color.argb(85, 207, 225, 235))
@@ -982,7 +982,8 @@ class OriginalEnergyView @JvmOverloads constructor(
 
     private fun durationText(minutes: Int?): String {
         if (minutes == null) return "--"
-        if (minutes < 60) return "${minutes}min"
-        return "${minutes / 60}h${minutes % 60}min"
+        val min = context.getString(R.string.ui_unit_min)
+        if (minutes < 60) return "$minutes$min"
+        return "${minutes / 60}${context.getString(R.string.ui_unit_hour)}${minutes % 60}$min"
     }
 }
