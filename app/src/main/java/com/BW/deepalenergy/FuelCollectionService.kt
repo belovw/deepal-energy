@@ -62,7 +62,10 @@ class FuelCollectionService : Service() {
                 val intervalMs = previousStartMs?.let { startedMs - it }
                 previousStartMs = startedMs
                 try {
-                    val snapshot = reader.readSnapshot()
+                    val snapshot = reader.readSnapshot().let { base ->
+                        val logcat = com.BW.deepalenergy.energy.readSignalsFromLogcat()
+                        if (logcat.error == null) base.withLogcatSignals(logcat.signals) else base
+                    }
                     val readMs = SystemClock.elapsedRealtime() - startedMs
                     FuelCollectionState.publish(snapshot)
                     store.observe(snapshot.avgFuelTrip2, snapshot.trip2DistanceKm)
