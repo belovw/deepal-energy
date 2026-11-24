@@ -12,16 +12,16 @@ import org.robolectric.annotation.GraphicsMode
 import java.io.File
 
 /**
- * Рисует главный экран в PNG без эмулятора (Robolectric), чтобы проверить расположение блоков.
- * Файл: app/build/screenshots/main_screen.png. Значения выдуманные, для проверки вёрстки.
+ * Рисует главный экран и страницу статистики в PNG без эмулятора (Robolectric), на русском языке.
+ * Файлы: app/build/screenshots/main_screen_ru.png и stats_screen_ru.png. Значения выдуманные.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [34], qualifiers = "ru")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class MainScreenScreenshotTest {
 
     @Test
-    fun renderMainScreen() {
+    fun renderScreens() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val view = OriginalEnergyView(context)
         view.setSnapshot(
@@ -53,11 +53,20 @@ class MainScreenScreenshotTest {
         )
         view.layout(0, 0, width, height)
 
+        render(view, width, height, "main_screen_ru.png")
+
+        // Вторая страница: прямо выставляем прогресс анимации, без жестов.
+        val progress = OriginalEnergyView::class.java.getDeclaredField("pageProgress")
+        progress.isAccessible = true
+        progress.setFloat(view, 1f)
+        render(view, width, height, "stats_screen_ru.png")
+    }
+
+    private fun render(view: View, width: Int, height: Int, name: String) {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         bitmap.eraseColor(0xFF303030.toInt())
         view.draw(Canvas(bitmap))
-
-        val out = File("build/screenshots/main_screen.png")
+        val out = File("build/screenshots/$name")
         out.parentFile?.mkdirs()
         out.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
