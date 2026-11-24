@@ -55,14 +55,14 @@ internal class FuelPermissionGate(
         }
         if (!promptWhenMissing || dialog != null) return
         show(AlertDialog.Builder(activity)
-            .setTitle("需要车况读取权限")
-            .setMessage("尚未获得 DUMP 权限，油量、续航及里程可能无法读取。\n\n" +
-                "点击“确认授权”后，先申请系统支持的车辆基础读取权限，再通过车机已有的 Root 尝试执行：\n\n" +
+            .setTitle(activity.getString(R.string.ui_perm_title))
+            .setMessage(activity.getString(R.string.ui_perm_msg1) +
+                activity.getString(R.string.ui_perm_msg2) +
                 "$command\n\n" +
-                "只为当前应用授予 DUMP；不会安装 Root。没有可用 Root 时，请使用 ADB 命令授权。")
-            .setPositiveButton("确认授权") { _, _ -> requestRuntimeAfterConsent() }
-            .setNeutralButton("查看 ADB 命令") { _, _ -> showAdbHelp("可在已连接车机的 ADB 终端执行以下命令。") }
-            .setNegativeButton("暂不授权") { _, _ -> readLimited() }
+                activity.getString(R.string.ui_perm_msg3))
+            .setPositiveButton(activity.getString(R.string.ui_confirm)) { _, _ -> requestRuntimeAfterConsent() }
+            .setNeutralButton(activity.getString(R.string.ui_show_adb)) { _, _ -> showAdbHelp(activity.getString(R.string.ui_adb_help_intro)) }
+            .setNegativeButton(activity.getString(R.string.ui_later)) { _, _ -> readLimited() }
             .setCancelable(false)
             .create())
     }
@@ -85,8 +85,8 @@ internal class FuelPermissionGate(
             return
         }
         val progress = AlertDialog.Builder(activity)
-            .setTitle("正在申请读取权限")
-            .setMessage("如系统弹出 Root 请求，请确认。应用会在完成后重新检测权限，最长等待约 15 秒。")
+            .setTitle(activity.getString(R.string.ui_requesting_title))
+            .setMessage(activity.getString(R.string.ui_requesting_msg))
             .setCancelable(false)
             .create()
         show(progress)
@@ -107,14 +107,14 @@ internal class FuelPermissionGate(
                 busy = false
                 if (activity.isFinishing || activity.isDestroyed) return@launch
                 if (verified) {
-                    Toast.makeText(activity, "读取权限已确认，开始采集", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity, activity.getString(R.string.ui_perm_ok_start), Toast.LENGTH_LONG).show()
                     onReadAllowed()
                 } else {
                     val reason = when {
-                        result.timedOut -> "授权等待超时，DUMP 仍未授予。"
-                        result.exitCode == -2 -> "车机没有可用的 Root 通道，应用无法自行授予 DUMP。"
-                        result.exitCode != 0 -> "系统拒绝了授权或 Root 不可用，DUMP 仍未授予。"
-                        else -> "命令已结束，但系统检测到 DUMP 仍未授予。"
+                        result.timedOut -> activity.getString(R.string.ui_timeout)
+                        result.exitCode == -2 -> activity.getString(R.string.ui_no_root)
+                        result.exitCode != 0 -> activity.getString(R.string.ui_denied)
+                        else -> activity.getString(R.string.ui_cmd_done_no_dump)
                     }
                     showAdbHelp(reason)
                 }
@@ -127,12 +127,12 @@ internal class FuelPermissionGate(
 
     private fun showAdbHelp(reason: String) {
         show(AlertDialog.Builder(activity)
-            .setTitle("通过 ADB 授权")
+            .setTitle(activity.getString(R.string.ui_adb_title))
             .setMessage("$reason\n\n$adbCommand\n\n" +
-                "此命令需要从 ADB shell 执行；普通 Termux/App 进程无法自行授予。执行后点击“重新检测”。")
-            .setNeutralButton("复制命令", null)
-            .setPositiveButton("重新检测", null)
-            .setNegativeButton("暂不授权") { _, _ -> readLimited() }
+                activity.getString(R.string.ui_adb_msg))
+            .setNeutralButton(activity.getString(R.string.ui_copy_cmd), null)
+            .setPositiveButton(activity.getString(R.string.ui_recheck), null)
+            .setNegativeButton(activity.getString(R.string.ui_later)) { _, _ -> readLimited() }
             .setCancelable(false)
             .create(), adbHelp = true)
     }
@@ -145,17 +145,17 @@ internal class FuelPermissionGate(
         if (adbHelp) {
             value.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
                 val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.setPrimaryClip(ClipData.newPlainText("车况读取授权", adbCommand))
-                Toast.makeText(activity, "ADB 命令已复制", Toast.LENGTH_SHORT).show()
+                clipboard.setPrimaryClip(ClipData.newPlainText(activity.getString(R.string.ui_clip_label), adbCommand))
+                Toast.makeText(activity, activity.getString(R.string.ui_cmd_copied), Toast.LENGTH_SHORT).show()
             }
             value.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 if (granted(DumpPermissionCommand.PERMISSION)) {
                     value.dismiss()
                     onReadAllowed()
-                    Toast.makeText(activity, "读取权限已确认", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, activity.getString(R.string.ui_perm_confirmed), Toast.LENGTH_SHORT).show()
                 } else {
                     AppLog.w("PERMISSION", "manual recheck: DUMP still missing")
-                    Toast.makeText(activity, "DUMP 仍未授予，请确认命令已在 ADB shell 执行", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity, activity.getString(R.string.ui_dump_still), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -163,7 +163,7 @@ internal class FuelPermissionGate(
 
     private fun readLimited() {
         AppLog.w("PERMISSION", "DUMP not granted; continuing with available read-only sources")
-        Toast.makeText(activity, "仅读取可用数据；可在诊断页重新检测权限", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, activity.getString(R.string.ui_read_limited), Toast.LENGTH_LONG).show()
         onReadAllowed()
     }
 

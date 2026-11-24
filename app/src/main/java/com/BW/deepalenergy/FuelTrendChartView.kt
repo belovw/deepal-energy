@@ -52,7 +52,7 @@ class FuelTrendChartView @JvmOverloads constructor(
         }
 
         if (points.size < 2) {
-            canvas.drawText("等待采样点...", left, h / 2f, textPaint)
+            canvas.drawText(context.getString(R.string.ui_waiting_samples), left, h / 2f, textPaint)
             return
         }
 

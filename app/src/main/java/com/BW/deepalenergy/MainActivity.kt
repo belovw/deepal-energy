@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         if (pollJob?.isActive == true || isFinishing || isDestroyed) return
         runCatching { FuelCollectionService.start(this) }.onFailure {
             AppLog.e("PERMISSION", "collector startup failed", it)
-            Toast.makeText(this, "采集服务未能启动，请在诊断页查看原因", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.ui_collector_failed), Toast.LENGTH_LONG).show()
             return
         }
         pollJob = lifecycleScope.launch {
@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity() {
                 "single-trip reset option result success=$success reported=${refreshed.singleTripResetOption}",
             )
             if (!success) {
-                Toast.makeText(this@MainActivity, "车机未授权修改自动重置方式", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.ui_no_auth_reset_mode), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -221,7 +221,7 @@ class MainActivity : AppCompatActivity() {
             energyView.setSnapshot(refreshed, isPreview = false)
             AppLog.i("ACTION", "subtotal reset result success=$success")
             if (!success) {
-                Toast.makeText(this@MainActivity, "车机未授权重置小计里程", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.ui_no_auth_subtotal), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -243,7 +243,7 @@ class MainActivity : AppCompatActivity() {
     private fun applyTheme() {
         val systemNight = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         val isLight = themeMode.isLight(systemNight)
-        energyView.setTheme(isLight, themeMode.label)
+        energyView.setTheme(isLight, getString(themeMode.labelRes))
         applySystemBars(isLight)
         AppLog.i("UI", "theme mode=${themeMode.name} systemNight=$systemNight light=$isLight")
     }

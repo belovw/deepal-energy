@@ -59,7 +59,7 @@ class OriginalEnergyView @JvmOverloads constructor(
     private var onSubtotalResetRequested: (() -> Unit)? = null
     private var onDiagnosticsRequested: (() -> Unit)? = null
     private var onThemeChanged: (() -> Unit)? = null
-    private var themeModeLabel = "随系统"
+    private var themeModeLabel = context.getString(R.string.ui_theme_system)
 
     private val medium = lynkcoTypeface(R.font.lynkco_type_medium)
     private val regular = medium
@@ -102,7 +102,7 @@ class OriginalEnergyView @JvmOverloads constructor(
     init {
         isClickable = true
         isFocusable = true
-        contentDescription = "能量中心，点击左侧下方里程统计入口；长按卡片查看诊断"
+        contentDescription = context.getString(R.string.ui_cd_energy)
     }
 
     fun setSnapshot(value: FuelEnergySnapshot, isPreview: Boolean) {
@@ -343,9 +343,9 @@ class OriginalEnergyView @JvmOverloads constructor(
             start()
         }
         contentDescription = if (target > 0.5f) {
-            "里程统计，点击左上角或向下滑动返回"
+            context.getString(R.string.ui_cd_stats)
         } else {
-            "能量中心，点击左侧下方里程统计入口；长按卡片查看诊断"
+            context.getString(R.string.ui_cd_energy)
         }
     }
 
@@ -368,9 +368,9 @@ class OriginalEnergyView @JvmOverloads constructor(
         paint.color = if (lightMode) surfaceColor else Color.argb(235, 20, 35, 48)
         canvas.drawRoundRect(panelRect, 16f, 16f, paint)
 
-        text(canvas, "能量中心", 126f, 225f, 36f, primaryText, medium)
-        text(canvas, if (preview) "预览" else "车辆数据", 620f, 222f, 22f, secondaryText, medium)
-        text(canvas, "预计续航", 126f, 308f, 24f, secondaryText, regular)
+        text(canvas, context.getString(R.string.ui_energy_center), 126f, 225f, 36f, primaryText, medium)
+        text(canvas, if (preview) context.getString(R.string.ui_preview) else context.getString(R.string.ui_vehicle_data), 620f, 222f, 22f, secondaryText, medium)
+        text(canvas, context.getString(R.string.ui_est_range), 126f, 308f, 24f, secondaryText, regular)
         val range = rangeText(data)
         text(canvas, range, 126f, 414f, 94f, primaryText, medium)
         val rangeWidth = paint.measureText(range)
@@ -379,15 +379,15 @@ class OriginalEnergyView @JvmOverloads constructor(
         line(canvas, 126f, 462f, 742f, 462f,
             if (lightMode) Color.argb(70, 84, 111, 126) else Color.argb(28, 255, 255, 255))
 
-        text(canvas, "本次平均油耗", 126f, 516f, 24f, secondaryText, medium)
+        text(canvas, context.getString(R.string.ui_trip_avg_fuel), 126f, 516f, 24f, secondaryText, medium)
         text(canvas, fuelText(data?.avgFuelTrip2), 126f, 585f, 58f, primaryText, medium)
         text(canvas, "L/100km", 126f, 622f, 22f, secondaryText, medium)
-        text(canvas, "小计平均油耗", 440f, 516f, 24f, secondaryText, medium)
+        text(canvas, context.getString(R.string.ui_sub_avg_fuel), 440f, 516f, 24f, secondaryText, medium)
         text(canvas, fuelText(data?.avgFuelTrip1), 440f, 585f, 44f, primaryText, medium)
         text(canvas, "L/100km", 440f, 622f, 22f, secondaryText, medium)
-        text(canvas, "小计里程", 126f, 680f, 22f, secondaryText, medium)
+        text(canvas, context.getString(R.string.ui_sub_distance), 126f, 680f, 22f, secondaryText, medium)
         text(canvas, distanceText(data?.trip1DistanceKm) + " km", 126f, 723f, 30f, primaryText, medium)
-        text(canvas, "总里程", 440f, 680f, 22f, secondaryText, medium)
+        text(canvas, context.getString(R.string.ui_total_distance), 440f, 680f, 22f, secondaryText, medium)
         text(canvas, distanceText(data?.odometerKm) + " km", 440f, 723f, 30f, primaryText, medium)
 
         paint.color = if (entryPressed) {
@@ -396,8 +396,8 @@ class OriginalEnergyView @JvmOverloads constructor(
             if (lightMode) Color.rgb(224, 236, 241) else Color.rgb(31, 51, 68)
         }
         canvas.drawRoundRect(statisticsEntryBounds, 12f, 12f, paint)
-        text(canvas, "里程统计", 130f, 804f, 26f, primaryText, medium)
-        text(canvas, "本次行程、小计与油耗估算", 130f, 840f, 22f, secondaryText, medium)
+        text(canvas, context.getString(R.string.ui_stats), 130f, 804f, 26f, primaryText, medium)
+        text(canvas, context.getString(R.string.ui_stats_sub), 130f, 840f, 22f, secondaryText, medium)
         drawChevron(canvas, 727f, statisticsEntryBounds.centerY(), 10f, secondaryText, pointsRight = true)
     }
 
@@ -411,7 +411,7 @@ class OriginalEnergyView @JvmOverloads constructor(
         canvas.rotate(-10f, 1330f, markerY + 36f)
         text(
             canvas,
-            "燃油余量",
+            context.getString(R.string.ui_fuel_margin),
             1328f,
             markerY + 40f,
             24f,
@@ -419,7 +419,7 @@ class OriginalEnergyView @JvmOverloads constructor(
             italic,
         )
         val litres = FuelQuantity.estimateLitres(percent)
-        text(canvas, if (litres == null) "-- L" else "约 %.1f L".format(java.util.Locale.CHINA, litres),
+        text(canvas, if (litres == null) "-- L" else context.getString(R.string.ui_fuel_litres, litres),
             1328f, markerY + 72f, 22f, secondaryText, medium)
         canvas.restore()
 
@@ -471,7 +471,7 @@ class OriginalEnergyView @JvmOverloads constructor(
         paint.shader = null
 
         drawChevron(canvas, 74f, 90f, 17f, primaryText, pointsRight = false)
-        text(canvas, "里程统计", 118f, 105f, 40f, primaryText, medium)
+        text(canvas, context.getString(R.string.ui_stats), 118f, 105f, 40f, primaryText, medium)
 
         drawGlassPanel(canvas, RectF(78f, 165f, 650f, 555f))
         drawGlassPanel(canvas, RectF(78f, 585f, 650f, 952f))
@@ -513,52 +513,52 @@ class OriginalEnergyView @JvmOverloads constructor(
         canvas.drawRoundRect(bounds, 16f, 16f, paint)
         paint.style = Paint.Style.FILL
 
-        text(canvas, "重置小计里程", 610f, 458f, 31f, primaryText, medium)
+        text(canvas, context.getString(R.string.ui_reset_sub_title), 610f, 458f, 31f, primaryText, medium)
         text(
             canvas,
-            "确认清除小计里程累计数据？能耗曲线不会被重置。",
+            context.getString(R.string.ui_reset_sub_msg),
             610f,
             516f,
             20f,
             Color.rgb(190, 211, 222),
             regular,
         )
-        drawPill(canvas, resetDialogCancelBounds, "取消", active = false)
-        drawPill(canvas, resetDialogConfirmBounds, "重置", active = true)
+        drawPill(canvas, resetDialogCancelBounds, context.getString(R.string.ui_cancel), active = false)
+        drawPill(canvas, resetDialogConfirmBounds, context.getString(R.string.ui_reset), active = true)
     }
 
     private fun drawCurrentTripCard(canvas: Canvas) {
         val data = snapshot
-        text(canvas, "本次里程", 122f, 226f, 31f, primaryText, medium)
+        text(canvas, context.getString(R.string.ui_trip_distance), 122f, 226f, 31f, primaryText, medium)
         if (preview) drawTwoSegmentControl(
             canvas,
             RectF(365f, 188f, 625f, 248f),
-            leftLabel = "停车重置",
-            rightLabel = "加油重置",
+            leftLabel = context.getString(R.string.ui_reset_parking),
+            rightLabel = context.getString(R.string.ui_reset_charging),
             leftActive = selectedResetOption == RESET_OPTION_PARKING,
             rightActive = selectedResetOption == RESET_OPTION_CHARGING,
         ) else {
             val resetLabel = when (selectedResetOption) {
-                RESET_OPTION_PARKING -> "自动重置 · 停车"
-                RESET_OPTION_CHARGING -> "自动重置 · 加油"
-                else -> "重置方式未知"
+                RESET_OPTION_PARKING -> context.getString(R.string.ui_auto_reset_parking)
+                RESET_OPTION_CHARGING -> context.getString(R.string.ui_auto_reset_charging)
+                else -> context.getString(R.string.ui_reset_unknown)
             }
             centeredText(canvas, resetLabel, RectF(365f, 188f, 625f, 248f), 22f, secondaryText, medium)
         }
 
         val resetDescription = if (selectedResetOption == null) {
-            "重置方式待读取 · 此处仅显示车辆状态"
+            context.getString(R.string.ui_reset_pending)
         } else if (selectedResetOption == RESET_OPTION_CHARGING) {
-            "自最近一次加油重置起 · 历史曲线保留"
+            context.getString(R.string.ui_since_charging)
         } else if (selectedResetOption == RESET_OPTION_PARKING) {
-            "自最近一次停车重置起 · 历史曲线保留"
-        } else "*暂时无法读取车辆的自动重置方式"
+            context.getString(R.string.ui_since_parking)
+        } else context.getString(R.string.ui_reset_unreadable)
         text(canvas, resetDescription, 122f, 282f, 22f, secondaryText, regular)
 
-        statMetric(canvas, durationText(data?.trip2DurationMinutes), "行驶时长", 220f, 350f)
-        statMetric(canvas, distanceText(data?.trip2DistanceKm) + " km", "行驶里程", 505f, 350f)
-        statMetric(canvas, speedText(data?.trip2AvgSpeed) + " km/h", "平均车速", 220f, 472f)
-        statMetric(canvas, fuelText(data?.avgFuelTrip2) + " L/100km", "本次油耗", 505f, 472f)
+        statMetric(canvas, durationText(data?.trip2DurationMinutes), context.getString(R.string.ui_drive_time), 220f, 350f)
+        statMetric(canvas, distanceText(data?.trip2DistanceKm) + " km", context.getString(R.string.ui_drive_distance), 505f, 350f)
+        statMetric(canvas, speedText(data?.trip2AvgSpeed) + " km/h", context.getString(R.string.ui_avg_speed), 220f, 472f)
+        statMetric(canvas, fuelText(data?.avgFuelTrip2) + " L/100km", context.getString(R.string.ui_trip_fuel), 505f, 472f)
 
         line(canvas, 364f, 308f, 364f, 525f, Color.argb(85, 207, 225, 235))
         line(canvas, 122f, 414f, 608f, 414f, Color.argb(70, 207, 225, 235))
@@ -566,13 +566,13 @@ class OriginalEnergyView @JvmOverloads constructor(
 
     private fun drawTripSummaryCard(canvas: Canvas) {
         val data = snapshot
-        text(canvas, "小计里程", 122f, 646f, 31f, primaryText, medium)
-        if (preview) drawPill(canvas, subtotalResetBounds, "重置数据", active = false)
+        text(canvas, context.getString(R.string.ui_sub_distance), 122f, 646f, 31f, primaryText, medium)
+        if (preview) drawPill(canvas, subtotalResetBounds, context.getString(R.string.ui_reset_data), active = false)
 
-        statMetric(canvas, durationText(data?.trip1DurationMinutes), "行驶时长", 220f, 755f)
-        statMetric(canvas, distanceText(data?.trip1DistanceKm) + " km", "行驶里程", 505f, 755f)
-        statMetric(canvas, speedText(data?.trip1AvgSpeed) + " km/h", "平均车速", 220f, 890f)
-        statMetric(canvas, fuelText(data?.avgFuelTrip1) + " L/100km", "平均油耗", 505f, 890f)
+        statMetric(canvas, durationText(data?.trip1DurationMinutes), context.getString(R.string.ui_drive_time), 220f, 755f)
+        statMetric(canvas, distanceText(data?.trip1DistanceKm) + " km", context.getString(R.string.ui_drive_distance), 505f, 755f)
+        statMetric(canvas, speedText(data?.trip1AvgSpeed) + " km/h", context.getString(R.string.ui_avg_speed), 220f, 890f)
+        statMetric(canvas, fuelText(data?.avgFuelTrip1) + " L/100km", context.getString(R.string.ui_avg_fuel), 505f, 890f)
 
         line(canvas, 364f, 700f, 364f, 940f, Color.argb(85, 207, 225, 235))
         line(canvas, 122f, 822f, 608f, 822f, Color.argb(70, 207, 225, 235))
@@ -580,10 +580,10 @@ class OriginalEnergyView @JvmOverloads constructor(
 
     private fun drawFuelCurveCard(canvas: Canvas) {
         val data = snapshot
-        text(canvas, "油耗估算", 730f, 226f, 31f, primaryText, medium)
+        text(canvas, context.getString(R.string.ui_fuel_estimate), 730f, 226f, 31f, primaryText, medium)
 
-        drawPill(canvas, history12Bounds, "近50km", active = selectedHistoryDistanceKm == 50)
-        drawPill(canvas, history24Bounds, "近100km", active = selectedHistoryDistanceKm == 100)
+        drawPill(canvas, history12Bounds, context.getString(R.string.ui_last50), active = selectedHistoryDistanceKm == 50)
+        drawPill(canvas, history24Bounds, context.getString(R.string.ui_last100), active = selectedHistoryDistanceKm == 100)
 
         val fallbackAverage = if (preview) {
             previewCurveAverage
@@ -630,7 +630,7 @@ class OriginalEnergyView @JvmOverloads constructor(
         text(canvas, "■", 730f, 306f, 18f, Color.rgb(20, 187, 244), medium)
         text(canvas, "L/100km", 755f, 306f, 19f, if (lightMode) secondaryText else Color.rgb(210, 227, 236), regular)
         val hasCurve = preview || visibleTrend.size >= 2
-        val averageLabel = if (hasCurve) "分段均值 ${fuelText(average)} L/100km" else "暂无有效分段"
+        val averageLabel = if (hasCurve) context.getString(R.string.ui_avg_segments, fuelText(average)) else context.getString(R.string.ui_no_segments)
         paint.textSize = 19f
         paint.typeface = medium
         text(
@@ -660,9 +660,9 @@ class OriginalEnergyView @JvmOverloads constructor(
         line(canvas, chartLeft, chartBottom, chartRight, chartBottom, axisColor)
 
         if (!hasCurve) {
-            centeredText(canvas, "行驶后生成油耗估算", RectF(chartLeft, 510f, chartRight, 570f), 30f, primaryText, medium)
-            centeredText(canvas, "累计足够的有效分段后显示曲线", RectF(chartLeft, 575f, chartRight, 625f), 24f, secondaryText, medium)
-            text(canvas, "根据累计平均油耗与里程估算，非瞬时油耗", chartLeft, 900f, 22f, secondaryText, medium)
+            centeredText(canvas, context.getString(R.string.ui_estimate_after_drive), RectF(chartLeft, 510f, chartRight, 570f), 30f, primaryText, medium)
+            centeredText(canvas, context.getString(R.string.ui_estimate_after_segments), RectF(chartLeft, 575f, chartRight, 625f), 24f, secondaryText, medium)
+            text(canvas, context.getString(R.string.ui_estimate_note), chartLeft, 900f, 22f, secondaryText, medium)
             return
         }
 
@@ -713,9 +713,9 @@ class OriginalEnergyView @JvmOverloads constructor(
         text(canvas, fuelText(average), chartRight + 10f, averageY + 7f, 17f, strongText, medium)
 
         val xLabels = if (selectedHistoryDistanceKm == 50) {
-            listOf("-50km", "-40", "-30", "-20", "-10", "此刻")
+            listOf("-50km", "-40", "-30", "-20", "-10", context.getString(R.string.ui_now))
         } else {
-            listOf("-100km", "-80", "-60", "-40", "-20", "此刻")
+            listOf("-100km", "-80", "-60", "-40", "-20", context.getString(R.string.ui_now))
         }
         xLabels.forEachIndexed { index, label ->
             val x = chartLeft + (chartRight - chartLeft) * index / (xLabels.size - 1)

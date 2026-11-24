@@ -1,7 +1,7 @@
 package com.BW.deepalenergy
 
-internal enum class AppThemeMode(val label: String) {
-    SYSTEM("随系统"), LIGHT("浅色"), DARK("深色");
+internal enum class AppThemeMode(val labelRes: Int) {
+    SYSTEM(R.string.ui_theme_system), LIGHT(R.string.ui_theme_light), DARK(R.string.ui_theme_dark);
 
     fun isLight(systemNight: Boolean): Boolean = when (this) {
         SYSTEM -> !systemNight
