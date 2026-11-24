@@ -8,6 +8,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 import java.io.File
 
 /**
@@ -16,6 +17,7 @@ import java.io.File
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 class MainScreenScreenshotTest {
 
     @Test
@@ -52,6 +54,7 @@ class MainScreenScreenshotTest {
         view.layout(0, 0, width, height)
 
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        bitmap.eraseColor(0xFF303030.toInt())
         view.draw(Canvas(bitmap))
 
         val out = File("build/screenshots/main_screen.png")
